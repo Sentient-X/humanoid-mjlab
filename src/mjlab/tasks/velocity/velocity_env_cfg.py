@@ -37,6 +37,13 @@ def make_velocity_env_cfg() -> ManagerBasedRlEnvCfg:
   # Observations
   ##
 
+  # Observation order (45 elements when base_lin_vel removed):
+  # 1. base_ang_vel (3)
+  # 2. projected_gravity (3)
+  # 3. command (3)
+  # 4. joint_pos (12)
+  # 5. joint_vel (12)
+  # 6. actions (12)
   policy_terms = {
     "base_lin_vel": ObservationTermCfg(
       func=mdp.builtin_sensor,
@@ -52,6 +59,10 @@ def make_velocity_env_cfg() -> ManagerBasedRlEnvCfg:
       func=mdp.projected_gravity,
       noise=Unoise(n_min=-0.05, n_max=0.05),
     ),
+    "command": ObservationTermCfg(
+      func=mdp.generated_commands,
+      params={"command_name": "twist"},
+    ),
     "joint_pos": ObservationTermCfg(
       func=mdp.joint_pos_rel,
       noise=Unoise(n_min=-0.01, n_max=0.01),
@@ -61,10 +72,6 @@ def make_velocity_env_cfg() -> ManagerBasedRlEnvCfg:
       noise=Unoise(n_min=-1.5, n_max=1.5),
     ),
     "actions": ObservationTermCfg(func=mdp.last_action),
-    "command": ObservationTermCfg(
-      func=mdp.generated_commands,
-      params={"command_name": "twist"},
-    ),
   }
 
   critic_terms = {
