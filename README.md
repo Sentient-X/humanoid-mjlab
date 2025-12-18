@@ -1,199 +1,116 @@
-![Project banner](docs/static/mjlab-banner.jpg)
+# Asimov Locomotion
 
-# mjlab
+Fork of [mujocolab/mjlab](https://github.com/mujocolab/mjlab) for the Asimov bipedal robot.
 
-<p align="left">
-  <img alt="tests" src="https://github.com/mujocolab/mjlab/actions/workflows/ci.yml/badge.svg" />
-  <a href="https://mujocolab.github.io/mjlab/nightly/"><img alt="benchmarks" src="https://img.shields.io/badge/nightly-blue" /></a>
+<p align="center">
+  <img src="docs/static/asimov_cad.png" alt="Asimov CAD" height="400"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/static/asimov_robot.jpeg" alt="Asimov Robot" height="400"/>
 </p>
 
-mjlab combines [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s proven API
-with best-in-class [MuJoCo](https://github.com/google-deepmind/mujoco_warp)
-physics to provide lightweight, modular abstractions for RL robotics research
-and sim-to-real deployment.
+---
 
-> ⚠️ **BETA PREVIEW** mjlab is in active development. Expect **breaking
-> changes** and **missing features** during the beta phase. There is **no stable
-> release yet**. The PyPI package is only a snapshot — for the latest fixes and
-> improvements, install from source or Git.
+## Demo
+
+**Sim2Sim in MuJoCo** - Multi-directional velocity tracking:
+
+<p align="center">
+  <img src="docs/static/asimov_sim2sim.gif" alt="Asimov Sim2Sim Demo" width="600"/>
+</p>
+
+---
+
+## Robot Modeling
+
+**12-DOF bipedal** (6 per leg): `hip_pitch`, `hip_roll`, `hip_yaw`, `knee`, `ankle_pitch`, `ankle_roll`
+
+Key characteristics:
+- **Canted hip pitch axis** (45° tilt) - unique kinematics vs standard humanoids
+- **Asymmetric left/right joint axes** - opposite signs for symmetric motion
+- **Narrow stance** (11.3cm) - requires conservative velocity limits
+
+---
+
+## Training
+
+### Reward Structure
+
+| Reward | Description |
+|--------|-------------|
+| **Velocity tracking** | Track commanded (vx, vy, ωz) |
+| **Imitation** | Match walking reference @ 1.25Hz gait |
+| **Alternating feet** | Enforce bipedal gait pattern |
+| **Pose** | Joint-specific variance (larger for canted hips, tight for ankles) |
+| **Air time** | Encourage dynamic stepping (light robot) |
+| **Self-collision** | Penalize inter-link collisions |
+
+### Configuration
+
+- PPO with adaptive LR, 5k iterations
+- Terrain curriculum
+- Network: `(256, 256, 128)` - sized for 12-DOF
+
+### Adaptations vs G1
+
+- Conservative velocity limits due to narrow 11.3cm stance
+- Higher `body_ang_vel` penalty (-0.08) for narrow-stance stability
+- Tight ankle pose constraints (limited ROM: ~±30° pitch, ±6° roll)
+- Larger hip variance in pose reward (canted axis couples roll/pitch)
+- Gait clock observation for phase-aware control
+
+---
+
+## Observations (Policy)
+
+| Observation | Source |
+|-------------|--------|
+| `base_ang_vel` | IMU |
+| `projected_gravity` | IMU |
+| `velocity_command` | (vx, vy, ωz) |
+| `joint_pos` | Relative to default pose |
+| `joint_vel` | Joint velocities |
+| `previous_actions` | Action history |
+| `gait_clock` | [cos(φ), sin(φ)] @ 1.25Hz for phase-aware control |
+
+**Removed:** `base_lin_vel` (no state estimator on real robot)
+
+---
+
+## Sim2Real
+
+- **Physics-based PD gains:** KP = J_reflected × ωn² (10Hz), KD = 5.0 Nm·s/rad (hardware max)
+- **Zero pose** used as default (mechanically stable)
 
 ---
 
 ## Quick Start
 
-mjlab requires an **NVIDIA GPU** for training (via MuJoCo Warp).
-macOS is supported only for evaluation, which is significantly slower.
-
 ```bash
 # Install uv if you haven't already
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and run
+git clone https://github.com/menloresearch/asimov-mjlab.git
+cd asimov-mjlab
+uv sync
 ```
 
-Run the demo (no installation needed):
+### Train Asimov Velocity Policy
 
 ```bash
-uvx --from mjlab --with "mujoco-warp @ git+https://github.com/google-deepmind/mujoco_warp@486642c3fa262a989b482e0e506716d5793d61a9" demo
+uv run train Mjlab-Velocity-Flat-Asimov --env.scene.num-envs 4096
 ```
 
-This launches an interactive viewer with a pre-trained Unitree G1 agent tracking a reference dance motion in MuJoCo Warp.
-
-> ❓ Having issues? See the [FAQ](docs/faq.md).
-
-**Try in Google Colab (no local setup required):**
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mujocolab/mjlab/blob/main/notebooks/demo.ipynb)
-
-Launch the demo directly in your browser with an interactive Viser viewer.
-
----
-
-## Installation
-
-**From source (recommended during beta):**
+### Evaluate Policy
 
 ```bash
-git clone https://github.com/mujocolab/mjlab.git
-cd mjlab
-uv run demo
-```
-
-**From PyPI (beta snapshot):**
-
-```bash
-uv add mjlab "mujoco-warp @ git+https://github.com/google-deepmind/mujoco_warp@486642c3fa262a989b482e0e506716d5793d61a9"
-```
-
-A Dockerfile is also provided.
-
-For full setup instructions, see the [Installation Guide](docs/installation_guide.md).
-
----
-
-## Training Examples
-
-### 1. Velocity Tracking
-
-Train a Unitree G1 humanoid to follow velocity commands on flat terrain:
-
-```bash
-uv run train Mjlab-Velocity-Flat-Unitree-G1 --env.scene.num-envs 4096
-```
-
-**Multi-GPU Training:** Scale to multiple GPUs using `--gpu-ids`:
-
-```bash
-uv run train Mjlab-Velocity-Flat-Unitree-G1 \
-  --gpu-ids 0 1 \
-  --env.scene.num-envs 4096
-```
-
-See the [Distributed Training guide](docs/api/distributed_training.md) for details.
-
-Evaluate a policy while training (fetches latest checkpoint from Weights & Biases):
-
-```bash
-uv run play Mjlab-Velocity-Flat-Unitree-G1 --wandb-run-path your-org/mjlab/run-id
-```
-
----
-
-### 2. Motion Imitation
-
-Train a Unitree G1 to mimic reference motions. mjlab uses
-[WandB](https://wandb.ai) to manage reference motion datasets:
-
-1. **Create a registry collection** in your WandB workspace named `Motions`
-
-2. **Set your WandB entity**:
-   ```bash
-   export WANDB_ENTITY=your-organization-name
-   ```
-
-3. **Process and upload motion files**:
-   ```bash
-   MUJOCO_GL=egl uv run src/mjlab/scripts/csv_to_npz.py \
-     --input-file /path/to/motion.csv \
-     --output-name motion_name \
-     --input-fps 30 \
-     --output-fps 50 \
-     --render  # Optional: generates preview video
-   ```
-
-> **Note**: For detailed motion preprocessing instructions, see the
-> [BeyondMimic documentation](https://github.com/HybridRobotics/whole_body_tracking/blob/main/README.md#motion-preprocessing--registry-setup).
-
-#### Train and Play
-
-```bash
-uv run train Mjlab-Tracking-Flat-Unitree-G1 --registry-name your-org/motions/motion-name --env.scene.num-envs 4096
-
-uv run play Mjlab-Tracking-Flat-Unitree-G1 --wandb-run-path your-org/mjlab/run-id
-```
-
----
-
-### 3. Sanity-check with Dummy Agents
-
-Use built-in agents to sanity check your MDP **before** training.
-
-```bash
-uv run play Mjlab-Your-Task-Id --agent zero  # Sends zero actions.
-uv run play Mjlab-Your-Task-Id --agent random  # Sends uniform random actions.
-```
-
-> [!NOTE] When running motion-tracking tasks, add
-> `--registry-name your-org/motions/motion-name` to the command.
-
----
-
-## Documentation
-
-- **[Installation Guide](docs/installation_guide.md)**
-- **[Why mjlab?](docs/motivation.md)**
-- **[Migration Guide](docs/migration_guide.md)**
-- **[FAQ & Troubleshooting](docs/faq.md)**
-
----
-
-## Development
-
-Run tests:
-
-```bash
-make test          # Run all tests
-make test-fast     # Skip slow integration tests
-```
-
-Format code:
-
-```bash
-uvx pre-commit install
-make format
+uv run play Mjlab-Velocity-Flat-Asimov --wandb-run-path your-org/mjlab/run-id
 ```
 
 ---
 
 ## License
 
-mjlab is licensed under the [Apache License, Version 2.0](LICENSE).
+Licensed under the [Apache License, Version 2.0](LICENSE).
 
-### Third-Party Code
-
-Some portions of mjlab are forked from external projects:
-
-- **`src/mjlab/utils/lab_api/`** — Utilities forked from [NVIDIA Isaac
-  Lab](https://github.com/isaac-sim/IsaacLab) (BSD-3-Clause license, see file
-  headers)
-
-Forked components retain their original licenses. See file headers for details.
-
----
-
-## Acknowledgments
-
-mjlab wouldn't exist without the excellent work of the Isaac Lab team, whose API
-design and abstractions mjlab builds upon.
-
-Thanks to the MuJoCo Warp team — especially Erik Frey and Taylor Howell — for
-answering our questions, giving helpful feedback, and implementing features
-based on our requests countless times.
+Based on [mjlab](https://github.com/mujocolab/mjlab) by MuJoCo Lab.
