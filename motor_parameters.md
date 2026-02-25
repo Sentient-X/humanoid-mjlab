@@ -1,4 +1,4 @@
-# Asimov Motor Parameters Reference
+# Humanoid Motor Parameters Reference
 
 ## Motor Assignments
 
@@ -200,7 +200,7 @@
 
 **Note:** From 2025/1/15, motors in red (larger models) have default KD range changed from 0~5 to 0~50.
 
-### Asimov Motor CAN Ranges (Extracted)
+### Humanoid Motor CAN Ranges (Extracted)
 
 | Joint | Motor Model | KP Range | KD Range | Torque (Nm) | Current (A) | KT (Nm/A) |
 |-------|-------------|----------|----------|-------------|-------------|-----------|
@@ -233,7 +233,7 @@ The CAN protocol reports current as 12-bit value (0-4095). The mapping to Amps d
 | EC-A5013-H17-100 | -30 ~ +30 | 60.0/4095 |
 | EC-A6013-H20-100 | -35 ~ +35 | 70.0/4095 |
 
-**Verified Current Ranges for Asimov Motors (from 2025.11.28 protocol table):**
+**Verified Current Ranges for Humanoid Motors (from 2025.11.28 protocol table):**
 
 | Joint | Actuator | CAN Current Range | Notes |
 |-------|----------|-------------------|-------|

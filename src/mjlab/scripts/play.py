@@ -123,6 +123,7 @@ def run_play(task_id: str, cfg: PlayConfig):
       resume_path, was_cached = get_wandb_checkpoint_path(
         log_root_path, Path(cfg.wandb_run_path)
       )
+#      resume_path = None
       # Extract run_id and checkpoint name from path for display.
       run_id = resume_path.parent.name
       checkpoint_name = resume_path.name

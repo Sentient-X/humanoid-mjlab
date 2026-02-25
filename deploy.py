@@ -1,5 +1,5 @@
 """
-Asimov Sim2Sim Deployment for mjlab-trained policies.
+Humanoid Sim2Sim Deployment for mjlab-trained policies.
 
 This script:
 1. Loads an ONNX policy exported from mjlab
@@ -7,7 +7,7 @@ This script:
 3. Builds observations matching mjlab's velocity task
 4. Runs sim2sim in MuJoCo with video recording and analysis
 
-Observation tensor layout (47 dims - mjlab Asimov with gait_clock):
+Observation tensor layout (47 dims - mjlab Humanoid with gait_clock):
   0-2:   base_ang_vel (3)    - IMU angular velocity in body frame
   3-5:   projected_gravity (3) - Gravity projected into body frame
   6-8:   command (3)         - Velocity command (vx, vy, wz)
@@ -39,7 +39,7 @@ import pandas as pd
 # ============================================================================
 
 # Robot model (same XML used for training)
-XML_PATH = "src/mjlab/asset_zoo/robots/asimov/xmls/asimov.xml"
+XML_PATH = "src/mjlab/asset_zoo/robots/humanoid/xmls/humanoid.xml"
 
 # Simulation parameters
 SIMULATION_DURATION = 20.0  # seconds
@@ -307,7 +307,7 @@ def analyze_results(csv_path, joint_names, output_prefix):
 # ============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="Asimov sim2sim deployment for mjlab policies")
+    parser = argparse.ArgumentParser(description="Humanoid sim2sim deployment for mjlab policies")
     parser.add_argument("--policy", type=str, required=True, help="Path to ONNX policy file")
     parser.add_argument("--cmd_vx", type=float, default=0.5, help="X velocity command (m/s)")
     parser.add_argument("--cmd_vy", type=float, default=0.0, help="Y velocity command (m/s)")
@@ -331,7 +331,7 @@ def main():
 
     # Load ONNX metadata
     print("=" * 60)
-    print("Asimov Sim2Sim - mjlab Policy Deployment")
+    print("Humanoid Sim2Sim - mjlab Policy Deployment")
     print("=" * 60)
     print(f"Policy: {args.policy}")
 
@@ -376,7 +376,7 @@ def main():
     # Load XML into MjSpec so we can modify actuators
     spec = mujoco.MjSpec.from_file(xml_path)
 
-    # Armature values from asimov_constants.py (reflected inertia)
+    # Armature values from humanoid_constants.py (reflected inertia)
     armatures = np.array([
         0.0652, 0.100, 0.0343, 0.0330, 0.0236, 0.0236,  # left leg
         0.0652, 0.100, 0.0343, 0.0330, 0.0236, 0.0236,  # right leg
@@ -500,7 +500,7 @@ def main():
             # Projected gravity
             grav = get_projected_gravity(pelvis_quat)
 
-            # Build observation vector (mjlab Asimov order - 47 dims):
+            # Build observation vector (mjlab Humanoid order - 47 dims):
             # [base_ang_vel(3), projected_gravity(3), command(3),
             #  joint_pos(12), joint_vel(12), actions(12), gait_clock(2)]
 
