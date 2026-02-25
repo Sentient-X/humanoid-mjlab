@@ -50,6 +50,25 @@
     <mesh name="right_foot2_link" file="right_foot2_link.stl" />
     <mesh name="right_ankle1_link"  file="right_ankle1_link.stl"/>
    <mesh name="right_ankle2_link"  file="right_ankle2_link.stl"/>
+   <mesh name="torso_link"  file="torso_link.stl"/>
+   <mesh name="waist_roll_link"  file="waist_roll_link.stl"/>
+   <mesh name="waist_pitch_link"  file="waist_pitch_link.stl"/>
+   <mesh name="chest_link"  file="chest_link.stl"/>
+   <mesh name="left_shoulder_pitch_link"  file="left_shoulder_pitch_link.stl"/>
+   <mesh name="left_shoulder_roll_link"  file="left_shoulder_roll_link.stl"/>
+   <mesh name="left_elbow_yaw_link"  file="left_elbow_yaw_link.stl"/>
+   <mesh name="left_elbow_forearm_yaw_link"  file="left_elbow_forearm_yaw_link.stl"/>
+   <mesh name="left_wrist_yaw_link"  file="left_wrist_yaw_link.stl"/>
+   <mesh name="right_shoulder_pitch_link"  file="right_shoulder_pitch_link.stl"/>
+   <mesh name="right_shoulder_roll_link"  file="right_shoulder_roll_link.stl"/>
+   <mesh name="right_elbow_yaw_link"  file="right_elbow_yaw_link.stl"/>
+   <mesh name="right_elbow_forearm_yaw_link"  file="right_elbow_forearm_yaw_link.stl"/>
+   <mesh name="right_wrist_yaw_link"  file="right_wrist_yaw_link.stl"/>
+   <mesh name="neck_link"  file="neck_link.stl"/>
+   <mesh name="neck_yaw_link"  file="neck_yaw_link.stl"/>
+   <mesh name="head_link"  file="head_link.stl"/>
+   <mesh name="camera_link"  file="camera_link.stl"/>
+   <mesh name="waist_rod_link"  file="waist_rod_link.stl"/> 
   </asset>
 
   <worldbody>
@@ -157,6 +176,7 @@
             </body>
           </body>
         </body>
+        
       </body>
       <site name="pelvis_link_site" pos="0 0 0" quat="1 0 0 0" />
       <camera name="front_camera" mode="track" fovy="90.0" quat="4.329780281177467e-17 4.329780281177466e-17 0.7071067811865475 0.7071067811865476" pos="0.0 2.0 0.5" />
