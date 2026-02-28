@@ -109,6 +109,12 @@ def humanoid_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         # Lower ankle variance due to limited ROM (±20° pitch, ±15° roll)
         r".*foot1.*": 0.2,
         r".*foot2.*": 0.12,
+        r".*torso.*": 0.3,
+        r".*shoulder.*": 0.1,
+        r".*elbow.*": 0.1,
+        r".*waist_roll.*": 0.1,
+        r".*waist_pitch.*": 0.1,
+        r".*wrist_yaw.*": 0.1,
     }
     cfg.rewards["pose"].params["std_running"] = {
         # Even larger variance for dynamic motion with canted hips
@@ -116,9 +122,16 @@ def humanoid_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         r".*hip_roll.*": 0.35,
         r".*hip_yaw.*": 0.3,
         r".*knee.*": 0.8,
+        
         # Keep feet constrained even when running
         r".*foot1.*": 0.25,
         r".*foot2.*": 0.15,
+        r".*torso.*": 0.3,
+        r".*shoulder.*": 0.15,
+        r".*elbow.*": 0.15,
+        r".*waist_roll.*": 0.15,
+        r".*waist_pitch.*": 0.15,
+        r".*wrist_yaw.*": 0.15,
     }
 
     cfg.rewards["upright"].params["asset_cfg"].body_names = ("pelvis_link",)

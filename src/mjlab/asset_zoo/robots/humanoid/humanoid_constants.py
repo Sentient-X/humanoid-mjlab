@@ -70,6 +70,13 @@ ARMATURE_HIP_YAW = 0.0343
 ARMATURE_KNEE = 0.0330
 ARMATURE_FOOT1 = 0.0236
 ARMATURE_FOOT2 = 0.0236
+ARMATURE_TORSO = 0.0330  # No armature for torso
+ARMATURE_SHOULDER = 0.02
+ARMATURE_ELBOW = 0.015
+ARMATURE_WAIST_ROLL = 0.01
+ARMATURE_WAIST_PITCH = 0.01
+ARMATURE_WRIST_YAW=0.01
+
 
 # Stiffness (KP) - physics based
 STIFFNESS_HIP_PITCH = ARMATURE_HIP_PITCH * NATURAL_FREQ**2
@@ -78,6 +85,12 @@ STIFFNESS_HIP_YAW = ARMATURE_HIP_YAW * NATURAL_FREQ**2
 STIFFNESS_KNEE = ARMATURE_KNEE * NATURAL_FREQ**2
 STIFFNESS_FOOT1 = ARMATURE_FOOT1 * NATURAL_FREQ**2
 STIFFNESS_FOOT2 = ARMATURE_FOOT2 * NATURAL_FREQ**2
+STIFFNESS_TORSO = ARMATURE_TORSO * NATURAL_FREQ**2
+STIFFNESS_SHOULDER = ARMATURE_SHOULDER * NATURAL_FREQ**2
+STIFFNESS_ELBOW = ARMATURE_ELBOW * NATURAL_FREQ**2
+STIFFNESS_WAIST_ROLL = ARMATURE_WAIST_ROLL * NATURAL_FREQ**2
+STIFFNESS_WAIST_PITCH = ARMATURE_WAIST_PITCH * NATURAL_FREQ**2
+STIFFNESS_WRIST_YAW = ARMATURE_WRIST_YAW * NATURAL_FREQ**2
 
 # Damping (KD) - capped at hardware max 5.0 Nm·s/rad for sim2real
 DAMPING_HIP_PITCH = 5.0
@@ -85,6 +98,12 @@ DAMPING_HIP_ROLL = 5.0
 DAMPING_HIP_YAW = 5.0
 DAMPING_KNEE = 5.0
 DAMPING_ANKLE = 5.0
+DAMPING_TORSO = 5.0
+DAMPING_SHOULDER = 5.0
+DAMPING_ELBOW = 5.0
+DAMPING_WAIST_ROLL = 5.0
+DAMPING_WAIST_PITCH = 5.0
+DAMPING_WRIST_YAW = 5.0
 
 # Effort limits (peak torque from datasheets)
 EFFORT_HIP_PITCH = 120.0  # EC-A6416-P2-25: peak 120 Nm
@@ -92,6 +111,17 @@ EFFORT_HIP_ROLL = 90.0    # EC-A5013-H17-100: peak 90 Nm
 EFFORT_HIP_YAW = 60.0     # EC-A3814-H14-107: peak 60 Nm
 EFFORT_KNEE = 75.0        # EC-A4315-P2-36: peak 75 Nm
 EFFORT_ANKLE = 36.0       # EC-A4310-P2-36: peak 36 Nm
+EFFORT_TORSO = 20       #  motor for torso
+EFFORT_SHOULDER = 40.0
+EFFORT_ELBOW = 30.0
+EFFORT_WAIST_ROLL = 15.0
+EFFORT_WAIST_PITCH = 15.0
+EFFORT_WRIST_YAW = 10.0
+
+
+
+
+
 
 HUMANOID_ACTUATOR_HIP_PITCH = BuiltinPositionActuatorCfg(
     joint_names_expr=(".*_hip_pitch_joint",),
@@ -132,7 +162,50 @@ HUMANOID_ACTUATOR_ANKLE = BuiltinPositionActuatorCfg(
     effort_limit=EFFORT_ANKLE,
     armature=ARMATURE_FOOT1,
 )
+HUMANOID_ACTION_TORSO = BuiltinPositionActuatorCfg(
+    joint_names_expr=("torso_joint",),
+    stiffness=STIFFNESS_TORSO,
+    damping=DAMPING_TORSO,
+    effort_limit=EFFORT_TORSO,
+    armature=ARMATURE_TORSO,
+)  
+HUMANOID_ACTUATOR_SHOULDER = BuiltinPositionActuatorCfg(
+    joint_names_expr=(".*_shoulder_.*_joint",),
+    stiffness=STIFFNESS_SHOULDER,
+    damping=DAMPING_SHOULDER,
+    effort_limit=EFFORT_SHOULDER,
+    armature=ARMATURE_SHOULDER,
+)
 
+HUMANOID_ACTUATOR_ELBOW = BuiltinPositionActuatorCfg(
+    joint_names_expr=(".*_elbow_.*_joint",),
+    stiffness=STIFFNESS_ELBOW,
+    damping=DAMPING_ELBOW,
+    effort_limit=EFFORT_ELBOW,
+    armature=ARMATURE_ELBOW,
+)
+
+HUMANOID_ACTUATOR_WAIST_ROLL = BuiltinPositionActuatorCfg(
+    joint_names_expr=("waist_roll_joint",),
+    stiffness=STIFFNESS_WAIST_ROLL,
+    damping=DAMPING_WAIST_ROLL,
+    effort_limit=EFFORT_WAIST_ROLL,
+    armature=ARMATURE_WAIST_ROLL,
+)
+HUMANOID_ACTUATOR_WAIST_PITCH = BuiltinPositionActuatorCfg(
+    joint_names_expr=("waist_pitch_joint",),
+    stiffness=STIFFNESS_WAIST_PITCH,
+    damping=DAMPING_WAIST_PITCH,
+    effort_limit=EFFORT_WAIST_PITCH,
+    armature=ARMATURE_WAIST_PITCH,
+)
+HUMANOID_ACTUATOR_WRIST_YAW = BuiltinPositionActuatorCfg(
+    joint_names_expr=(".*_wrist_yaw_joint",),
+    stiffness=STIFFNESS_WRIST_YAW,
+    damping=DAMPING_WRIST_YAW,
+    effort_limit=EFFORT_WRIST_YAW,
+    armature=ARMATURE_WRIST_YAW,
+)
 ##
 # Keyframe config.
 ##
@@ -166,6 +239,13 @@ KNEES_BENT_KEYFRAME = EntityCfg.InitialStateCfg(
         "left_foot1_joint": -0.2,   # Compensate for knee bend
         "right_foot1_joint": 0.2,   # Opposite sign
         ".*_foot2_joint": 0.0,
+        "torso_joint": 0.4,
+        "waist_roll_joint": 0.0,
+        "waist_pitch_joint": 0.0,
+        ".*_shoulder_.*_joint": 0.0,
+        ".*_elbow_.*_joint": 0.0,
+        ".*_wrist_yaw_joint": 0.0,
+
     },
     joint_vel={".*": 0.0},
 )
@@ -206,6 +286,12 @@ HUMANOID_ARTICULATION = EntityArticulationInfoCfg(
         HUMANOID_ACTUATOR_HIP_YAW,
         HUMANOID_ACTUATOR_KNEE,
         HUMANOID_ACTUATOR_ANKLE,
+        HUMANOID_ACTION_TORSO,
+        HUMANOID_ACTUATOR_SHOULDER,
+        HUMANOID_ACTUATOR_ELBOW,
+        HUMANOID_ACTUATOR_WAIST_ROLL,
+        HUMANOID_ACTUATOR_WAIST_PITCH,
+        
     ),
     soft_joint_pos_limit_factor=0.9,
 )
