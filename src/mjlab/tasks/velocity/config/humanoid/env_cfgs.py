@@ -110,10 +110,10 @@ def humanoid_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         r".*foot1.*": 0.2,
         r".*foot2.*": 0.12,
         r".*torso.*": 0.3,
+         r".*waist_roll.*": 0.3,
+        r".*waist_pitch.*": 0.1,
         r".*shoulder.*": 0.1,
         r".*elbow.*": 0.1,
-        r".*waist_roll.*": 0.1,
-        r".*waist_pitch.*": 0.1,
         r".*wrist_yaw.*": 0.1,
     }
     cfg.rewards["pose"].params["std_running"] = {
@@ -127,10 +127,10 @@ def humanoid_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
         r".*foot1.*": 0.25,
         r".*foot2.*": 0.15,
         r".*torso.*": 0.3,
-        r".*shoulder.*": 0.15,
-        r".*elbow.*": 0.15,
         r".*waist_roll.*": 0.15,
         r".*waist_pitch.*": 0.15,
+        r".*shoulder.*": 0.15,
+        r".*elbow.*": 0.15,
         r".*wrist_yaw.*": 0.15,
     }
 

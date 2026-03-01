@@ -106,16 +106,16 @@ DAMPING_WAIST_PITCH = 5.0
 DAMPING_WRIST_YAW = 5.0
 
 # Effort limits (peak torque from datasheets)
-EFFORT_HIP_PITCH = 120.0  # EC-A6416-P2-25: peak 120 Nm
-EFFORT_HIP_ROLL = 90.0    # EC-A5013-H17-100: peak 90 Nm
-EFFORT_HIP_YAW = 60.0     # EC-A3814-H14-107: peak 60 Nm
-EFFORT_KNEE = 75.0        # EC-A4315-P2-36: peak 75 Nm
+EFFORT_HIP_PITCH = 140.0  # EC-A6416-P2-25: peak 120 Nm
+EFFORT_HIP_ROLL = 100.0    # EC-A5013-H17-100: peak 90 Nm
+EFFORT_HIP_YAW = 80.0     # EC-A3814-H14-107: peak 60 Nm
+EFFORT_KNEE = 95.0        # EC-A4315-P2-36: peak 75 Nm
 EFFORT_ANKLE = 36.0       # EC-A4310-P2-36: peak 36 Nm
-EFFORT_TORSO = 20       #  motor for torso
-EFFORT_SHOULDER = 40.0
-EFFORT_ELBOW = 30.0
-EFFORT_WAIST_ROLL = 15.0
-EFFORT_WAIST_PITCH = 15.0
+EFFORT_TORSO = 10.0       #  motor for torso
+EFFORT_SHOULDER = 10.0
+EFFORT_ELBOW = 10.0
+EFFORT_WAIST_ROLL = 10.0
+EFFORT_WAIST_PITCH = 10.0
 EFFORT_WRIST_YAW = 10.0
 
 
@@ -169,6 +169,21 @@ HUMANOID_ACTION_TORSO = BuiltinPositionActuatorCfg(
     effort_limit=EFFORT_TORSO,
     armature=ARMATURE_TORSO,
 )  
+HUMANOID_ACTUATOR_WAIST_ROLL = BuiltinPositionActuatorCfg(
+    joint_names_expr=("waist_roll_joint",),
+    stiffness=STIFFNESS_WAIST_ROLL,
+    damping=DAMPING_WAIST_ROLL,
+    effort_limit=EFFORT_WAIST_ROLL,
+    armature=ARMATURE_WAIST_ROLL,
+)
+HUMANOID_ACTUATOR_WAIST_PITCH = BuiltinPositionActuatorCfg(
+    joint_names_expr=("waist_pitch_joint",),
+    stiffness=STIFFNESS_WAIST_PITCH,
+    damping=DAMPING_WAIST_PITCH,
+    effort_limit=EFFORT_WAIST_PITCH,
+    armature=ARMATURE_WAIST_PITCH,
+)
+
 HUMANOID_ACTUATOR_SHOULDER = BuiltinPositionActuatorCfg(
     joint_names_expr=(".*_shoulder_.*_joint",),
     stiffness=STIFFNESS_SHOULDER,
@@ -185,20 +200,6 @@ HUMANOID_ACTUATOR_ELBOW = BuiltinPositionActuatorCfg(
     armature=ARMATURE_ELBOW,
 )
 
-HUMANOID_ACTUATOR_WAIST_ROLL = BuiltinPositionActuatorCfg(
-    joint_names_expr=("waist_roll_joint",),
-    stiffness=STIFFNESS_WAIST_ROLL,
-    damping=DAMPING_WAIST_ROLL,
-    effort_limit=EFFORT_WAIST_ROLL,
-    armature=ARMATURE_WAIST_ROLL,
-)
-HUMANOID_ACTUATOR_WAIST_PITCH = BuiltinPositionActuatorCfg(
-    joint_names_expr=("waist_pitch_joint",),
-    stiffness=STIFFNESS_WAIST_PITCH,
-    damping=DAMPING_WAIST_PITCH,
-    effort_limit=EFFORT_WAIST_PITCH,
-    armature=ARMATURE_WAIST_PITCH,
-)
 HUMANOID_ACTUATOR_WRIST_YAW = BuiltinPositionActuatorCfg(
     joint_names_expr=(".*_wrist_yaw_joint",),
     stiffness=STIFFNESS_WRIST_YAW,
@@ -287,10 +288,11 @@ HUMANOID_ARTICULATION = EntityArticulationInfoCfg(
         HUMANOID_ACTUATOR_KNEE,
         HUMANOID_ACTUATOR_ANKLE,
         HUMANOID_ACTION_TORSO,
-        HUMANOID_ACTUATOR_SHOULDER,
-        HUMANOID_ACTUATOR_ELBOW,
         HUMANOID_ACTUATOR_WAIST_ROLL,
         HUMANOID_ACTUATOR_WAIST_PITCH,
+        HUMANOID_ACTUATOR_SHOULDER,
+        HUMANOID_ACTUATOR_ELBOW,
+        HUMANOID_ACTUATOR_WRIST_YAW,
         
     ),
     soft_joint_pos_limit_factor=0.9,
